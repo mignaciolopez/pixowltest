@@ -60,13 +60,16 @@ bool GameScene::init()
 		addChild(m_btnQuit, 1);
 	}
 
+	setOnExitCallback(CC_CALLBACK_0(GameScene::mainSceneOnExit, this));
 
 	scheduleUpdate();
+
+	m_timeElapsed = 0.0f;
 
 	return true;
 }
 
-void GameScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::TouchEventType type)
+void GameScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::TouchEventType type) const
 {
 	switch (type)
 	{
@@ -83,7 +86,26 @@ void GameScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::Touch
 	}
 }
 
+void GameScene::mainSceneOnExit()
+{
+	for (auto& bf : m_badFishes)
+	{
+		if (bf)
+		{
+			delete bf;
+			bf = nullptr;
+		}
+	}
+}
+
 void GameScene::update(float dt)
 {
+	m_timeElapsed += dt;
 
+	if (m_timeElapsed > 1.0f)
+	{
+		m_timeElapsed = 0.0f;
+		BadFish* bf = new (std::nothrow) BadFish(this);
+		m_badFishes.push_back(bf);
+	}
 }

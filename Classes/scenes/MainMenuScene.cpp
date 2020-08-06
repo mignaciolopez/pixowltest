@@ -82,7 +82,7 @@ bool MainMenuScene::init()
     return true;
 }
 
-void MainMenuScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::TouchEventType type)
+void MainMenuScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::TouchEventType type) const
 {
 	auto btn = dynamic_cast<ui::Button*>(pSender);
 	if (!btn || btn->getContentSize().width == 0)

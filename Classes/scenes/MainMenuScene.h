@@ -14,7 +14,7 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(MainMenuScene);
 
-	void btnTouchEvent(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void btnTouchEvent(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type) const;
 
 private:
 	cocos2d::ui::Button* m_btnPlay = nullptr;
