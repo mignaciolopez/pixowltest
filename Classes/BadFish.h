@@ -2,17 +2,25 @@
 #define BAD_FISH_H
 
 #include "cocos2d.h"
+#include "graphics/TP_graphics.hpp"
 
-class BadFish
+class BadFish : public cocos2d::Sprite
 {
 public:
-	BadFish(cocos2d::Node* parent);
-	~BadFish();
+	static BadFish* createBadFish();
 
-	void onExitCallBack();
+	virtual bool init() override;
+
+	CREATE_FUNC(BadFish);
+
+	bool didReachCenter();
 
 private:
-	cocos2d::Sprite* m_sprite;
+	void setRandomPosition();
+	void runAxnToCenter();
+	void gameOver();
+
+	bool m_reachCenter = false;
 };
 
 #endif // !BAD_FISH_H

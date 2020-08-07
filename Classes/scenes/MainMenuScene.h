@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 
+#include "graphics/TP_graphics.hpp"
+
 class MainMenuScene : public cocos2d::Scene
 {
 public:

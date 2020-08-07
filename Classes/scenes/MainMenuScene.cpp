@@ -29,12 +29,13 @@ bool MainMenuScene::init()
     /////////////////////////////
     // 3. add your codes below...
 
+	TP::TP_graphics::addSpriteFramesToCache();
+
     // add a label shows "Hello World"
     // create and initialize a label
-
-	auto sprBackground = Sprite::create("menuBackground.png");
+	auto sprBackground = Sprite::createWithSpriteFrameName(TP::TP_graphics::menuBackground);
 	if (!sprBackground)
-		cocos2d::log("[MainMenuScene]::init() | Problem loading menuBackground.png");
+		cocos2d::log("[MainMenuScene]::init() | Problem loading %s", TP::TP_graphics::menuBackground.c_str());
 	else
 	{
 		sprBackground->setContentSize(visibleSize);
