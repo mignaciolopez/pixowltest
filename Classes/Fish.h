@@ -17,6 +17,8 @@ public:
 
 private:
 	cocos2d::Animation m_fishAnimation;
+
+	float m_fishScale;
 };
 
 #endif // !FISH_H

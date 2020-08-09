@@ -20,7 +20,11 @@ bool Fish::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	setScale(0.2f);
+	auto conf = Configuration::getInstance();
+
+	m_fishScale = conf->getValue("fishScale", (Value)0.2f).asFloat();
+
+	setScale(m_fishScale);
 	setAnchorPoint(Vec2(0.5f, 0.5f));
 	setPosition(visibleSize.width / 2.0f + origin.x, visibleSize.height / 2.0f + origin.y);
 	setRotation(-270.0f);
@@ -39,6 +43,10 @@ void Fish::rotate(cocos2d::Vec2 touchLocation)
 	
 	if (rot < 0.0f)
 		rot += 360.0f;
+
+	/*auto axn = RotateTo::create(0.2f, -rot);
+	runAction(axn->clone());
+	return;*/
 
 	setRotation(-rot);
 

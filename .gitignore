@@ -2,9 +2,13 @@ proj.win32/Debug.win32/
 proj.win32/Release.win32/
 proj.android/app/build/
 proj.android/app/.cxx/cmake/
+proj.android/.idea/
 cocos2d/cocos/platform/android/libcocos2dx/build/
 cocos2d/build/
 proj.ios_mac/build/
+cocos2d/cocos/platform/android/libcocos2dx/libcocos2dx.iml
+proj.android/app/PixowlTest.iml
+proj.android/proj.android.iml
 .VC*
 .vs*
 *.tlog

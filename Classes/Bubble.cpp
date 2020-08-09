@@ -20,24 +20,29 @@ bool Bubble::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	setScale(0.3f);
-	setOpacity(80.0f);
+	auto conf = Configuration::getInstance();
+
+	m_bubbleScale = conf->getValue("bubbleScale", (Value)0.3f).asFloat();
+	m_bubbleLifeTime = conf->getValue("bubbleLifeTime", (Value)2.0f).asFloat();
+	m_bubbleOpacity = conf->getValue("bubbleOpacity", (Value)80).asInt();
+
+	setScale(m_bubbleScale);
+	setOpacity(m_bubbleOpacity);
 	setOpacityModifyRGB(true);
 	setAnchorPoint(Vec2(0.5f, 0.5f));
 	setIgnoreAnchorPointForPosition(false);
 
 	scheduleUpdate();
 
-	m_lifeTime = 2.0f;
 
 	return true;
 }
 
 void Bubble::update(float dt)
 {
-	m_lifeTime -= dt;
+	m_bubbleLifeTime -= dt;
 
-	if (m_lifeTime < 0.0f)
+	if (m_bubbleLifeTime < 0.0f)
 		if(getParent())
 			getParent()->removeChild(this);
 }

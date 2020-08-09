@@ -16,7 +16,10 @@ public:
 	void update(float dt);
 
 private:
-	float m_lifeTime = 5.0f;
+	float m_bubbleScale,
+		m_bubbleLifeTime;
+
+	int m_bubbleOpacity;
 
 };
 

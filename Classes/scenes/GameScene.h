@@ -35,6 +35,7 @@ public:
 
 private:
 	void spawnBubble();
+	void spawnBadFish();
 	void checkCollissions();
 	void GameOver();
 
@@ -52,6 +53,13 @@ private:
 	Fish* m_fish = nullptr;
 
 	bool m_gameOver = false;
+
+	float m_gameFPS,
+		m_gameOverFPS,
+		m_fishAnimationTime,
+		m_badFishSpawnInterval,
+		m_bubbleUnitVector,
+		m_bubblesSpawnInterval;
 };
 
 #endif // !GANE_SCENE

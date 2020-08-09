@@ -22,20 +22,20 @@ bool BadFish::init()
 
 	std::srand(std::time(nullptr)); // use current time as seed for random generator
 
-	setScale(0.2f);
+	auto conf = Configuration::getInstance();
+
+	m_badFishMinVel = conf->getValue("badFishMinVel", (Value)4).asUnsignedInt();
+	m_badFishMaxVel = conf->getValue("badFishMaxVel", (Value)8).asUnsignedInt();
+	m_badFishScale = conf->getValue("badFishScale", (Value)0.2f).asFloat();
+
+
+	setScale(m_badFishScale);
 	setAnchorPoint(Vec2(0.5f, 0.5f));
 	setRandomPosition();
 
 	runAxnToCenter();
 
-	m_reachCenter = false;
-
 	return true;
-}
-
-bool BadFish::didReachCenter()
-{
-	return m_reachCenter;
 }
 
 void BadFish::setRandomPosition()
@@ -80,15 +80,8 @@ void BadFish::runAxnToCenter()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto duration = std::rand() % 8 + 3;
+	auto duration = std::rand() % m_badFishMaxVel + m_badFishMinVel;
 	//cocos2d::log("[BadFish]::runAxnToCenter() | duration: %d", duration);
-	CallFuncN* callback = CallFuncN::create(CC_CALLBACK_0(BadFish::gameOver, this));
 	auto axn = MoveTo::create(duration, Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-	auto seq = Sequence::create(axn, callback, nullptr);
-	runAction(seq);
-}
-
-void BadFish::gameOver()
-{
-	m_reachCenter = true;
+	runAction(axn);
 }

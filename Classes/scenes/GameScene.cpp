@@ -27,8 +27,14 @@ bool GameScene::init()
 	/////////////////////////////
 	// 3. add your codes below...
 
-	// add a label shows "Hello World"
-	// create and initialize a label
+	auto conf = Configuration::getInstance();
+
+	m_gameFPS = conf->getValue("gameFPS", (Value)60).asInt();
+	m_gameOverFPS = conf->getValue("gameOverFPS", (Value)30).asInt();
+	m_fishAnimationTime = conf->getValue("fishAnimationTime", (Value)0.2f).asFloat();
+	m_badFishSpawnInterval = conf->getValue("badFishSpawnInterval", (Value)1.0f).asFloat();
+	m_bubbleUnitVector = conf->getValue("bubbleUnitVector", (Value)2.5f).asFloat();
+	m_bubblesSpawnInterval = conf->getValue("bubblesSpawnInterval", (Value)0.2f).asFloat();
 
 	auto sprBackground = Sprite::createWithSpriteFrameName(TP::TP_graphics::background);
 	if (!sprBackground)
@@ -84,6 +90,8 @@ bool GameScene::init()
 	m_bubblesCount = 0;
 	m_gameOver = false;
 
+	Director::getInstance()->setAnimationInterval(1.0f / m_gameFPS);
+
 	return true;
 }
 
@@ -106,7 +114,11 @@ void GameScene::btnTouchEvent(cocos2d::Ref * pSender, cocos2d::ui::Widget::Touch
 
 void GameScene::mainSceneOnExit()
 {
-	
+	m_bubbles.clear();
+	m_bubblesCount = 0;
+
+	m_badFishes.clear();
+	m_badsCount = 0;
 }
 
 void GameScene::update(float dt)
@@ -117,59 +129,65 @@ void GameScene::update(float dt)
 	m_timeBubbles += dt;
 	m_timeBadFish += dt;
 
-	if (m_timeBadFish > 1.0f)
-	{
-		m_timeBadFish = 0.0f;
-		auto bf = BadFish::createBadFish();
-		if (bf)
-		{
-			addChild(bf, 2);
-			bf->setOnExitCallback(CC_CALLBACK_0(GameScene::badFishOnExit, this, bf));
-			m_badFishes.emplace(m_badsCount, bf);
-			bf->setTag(m_badsCount++);
-		}
-	}
-
+	spawnBadFish();
 	checkCollissions();
 }
 
 void GameScene::badFishOnExit(cocos2d::Ref* pSender)
 {
 	auto bf = dynamic_cast<BadFish*>(pSender);
+	auto bftouched = dynamic_cast<BadFish*>(getUserObject());
 
 	if (!bf)
 		return;
 
 	if (m_badFishes.find(bf->getTag()) != m_badFishes.end())
 		m_badFishes.erase(bf->getTag());
+
+	if (bftouched)
+		if (bf->getTag() == bftouched->getTag())
+			setUserObject(nullptr);
 }
 
 bool GameScene::onTouchBegan(cocos2d::Touch * touch, cocos2d::Event * evnt)
 {
-	
-	return true;
+	if (m_gameOver)
+		return false;
+
+	m_fish->rotate(touch->getLocation());
+
+	for (auto& bf : m_badFishes)
+	{
+		if (bf.second->getBoundingBox().containsPoint(touch->getLocation()))
+		{
+			setUserObject(bf.second);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
 {
-	if (m_gameOver)
-		return;
-
 	m_fish->rotate(touch->getLocation());
-	if (m_timeBubbles > 0.2f)
+
+	if (m_timeBubbles > m_bubblesSpawnInterval)
 	{
-		m_timeBubbles = 0.0f;
-		spawnBubble();
+		auto bftouched = dynamic_cast<BadFish*>(getUserObject());
+
+		if (bftouched)
+		{
+			m_timeBubbles = 0.0f;
+			spawnBubble();
+		}
 	}
+
 }
 
 void GameScene::onTouchEnded(cocos2d::Touch * touch, cocos2d::Event * evnt)
 {
-	if (m_gameOver)
-		return;
-
-	m_fish->rotate(touch->getLocation());
-	spawnBubble();
+	onTouchMoved(touch, evnt);
 }
 
 void GameScene::onTouchCancelled(cocos2d::Touch * touch, cocos2d::Event * evnt)
@@ -198,8 +216,8 @@ void GameScene::spawnBubble()
 	mouthPos.y += unitVector.y * - fishSize.height;
 	bubble->setPosition(mouthPos);
 
-	unitVector.x *=   visibleSize.width  / 2.5f;
-	unitVector.y *= - visibleSize.height / 2.5f;
+	unitVector.x *=   visibleSize.width  / m_bubbleUnitVector;
+	unitVector.y *= - visibleSize.height / m_bubbleUnitVector;
 	auto axn = MoveBy::create(3.0f, unitVector);
 	bubble->runAction(axn);
 
@@ -208,21 +226,37 @@ void GameScene::spawnBubble()
 		m_bubbles.erase(bubble->getTag());
 	});
 
-	m_fish->runAction(TP::TP_graphics::createFISHAnimateAction(0.2f));
+	m_fish->runAction(TP::TP_graphics::createFISHAnimateAction(m_fishAnimationTime));
+}
+
+void GameScene::spawnBadFish()
+{
+	if (m_timeBadFish > m_badFishSpawnInterval)
+	{
+		m_timeBadFish = 0.0f;
+		auto bf = BadFish::createBadFish();
+		if (bf)
+		{
+			addChild(bf, 2);
+			bf->setOnExitCallback(CC_CALLBACK_0(GameScene::badFishOnExit, this, bf));
+			m_badFishes.emplace(m_badsCount, bf);
+			bf->setTag(m_badsCount++);
+		}
+	}
 }
 
 void GameScene::checkCollissions()
 {
 	for (auto& bf : m_badFishes)
 	{
-		if (bf.second->didReachCenter())
+		if (m_fish->getBoundingBox().intersectsRect(bf.second->getBoundingBox()))
 		{
 			GameOver();
 			return;
 		}
 		for (auto& bubble : m_bubbles)
 		{
-			if (bf.second->getBoundingBox().containsPoint(bubble.second->getPosition()))
+			if (bf.second->getBoundingBox().intersectsRect(bubble.second->getBoundingBox()))
 			{
 				removeChild(bubble.second);
 				removeChild(bf.second);
@@ -243,5 +277,5 @@ void GameScene::GameOver()
 	label->setPosition(Vec2(visibleSize.width / 2.0f + origin.x, visibleSize.height / 2.0f + origin.y));
 	addChild(label, 5);
 	m_gameOver = true;
-	Director::getInstance()->setAnimationInterval(1.0f / 30);
+	Director::getInstance()->setAnimationInterval(1.0f / m_gameOverFPS);
 }

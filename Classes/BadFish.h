@@ -13,14 +13,14 @@ public:
 
 	CREATE_FUNC(BadFish);
 
-	bool didReachCenter();
-
 private:
 	void setRandomPosition();
 	void runAxnToCenter();
-	void gameOver();
 
-	bool m_reachCenter = false;
+	float m_badFishScale;
+
+	unsigned int m_badFishMinVel, m_badFishMaxVel;
+
 };
 
 #endif // !BAD_FISH_H
