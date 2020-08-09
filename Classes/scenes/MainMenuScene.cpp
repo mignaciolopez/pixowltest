@@ -29,12 +29,32 @@ bool MainMenuScene::init()
     /////////////////////////////
     // 3. add your codes below...
 
+	TP::TP_graphics::addSpriteFramesToCache();
+
+	Configuration* conf = Configuration::getInstance();
+	conf->setValue("gameFPS", static_cast<Value>(60));
+	conf->setValue("gameOverFPS", static_cast<Value>(30));
+
+	conf->setValue("fishScale", static_cast<Value>(0.2f));
+	conf->setValue("fishAnimationTime", static_cast<Value>(0.2f));
+
+	conf->setValue("badFishScale", static_cast<Value>(0.2f));
+	conf->setValue("badFishMinVel", static_cast<Value>(3));
+	conf->setValue("badFishMaxVel", static_cast<Value>(6));
+	conf->setValue("badFishSpawnInterval", static_cast<Value>(0.8f));
+
+	conf->setValue("bubbleMoveBy", static_cast<Value>(2.0f));
+	conf->setValue("bubbleUnitVector", static_cast<Value>(2.5f));
+	conf->setValue("bubbleScale", static_cast<Value>(0.3f));
+	conf->setValue("bubbleOpacity", static_cast<Value>(80));
+	conf->setValue("bubbleLifeTime", static_cast<Value>(1.5f));
+	conf->setValue("bubblesSpawnInterval", static_cast<Value>(0.4f));
+
     // add a label shows "Hello World"
     // create and initialize a label
-
-	auto sprBackground = Sprite::create("menuBackground.png");
+	auto sprBackground = Sprite::createWithSpriteFrameName(TP::TP_graphics::menuBackground);
 	if (!sprBackground)
-		cocos2d::log("[MainMenuScene]::init() | Problem loading menuBackground.png");
+		cocos2d::log("[MainMenuScene]::init() | Problem loading %s", TP::TP_graphics::menuBackground.c_str());
 	else
 	{
 		sprBackground->setContentSize(visibleSize);
