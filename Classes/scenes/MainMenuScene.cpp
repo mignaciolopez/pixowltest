@@ -39,9 +39,9 @@ bool MainMenuScene::init()
 	conf->setValue("fishAnimationTime", static_cast<Value>(0.2f));
 
 	conf->setValue("badFishScale", static_cast<Value>(0.2f));
-	conf->setValue("badFishMinVel", static_cast<Value>(3));
-	conf->setValue("badFishMaxVel", static_cast<Value>(6));
-	conf->setValue("badFishSpawnInterval", static_cast<Value>(0.8f));
+	conf->setValue("badFishMinVel", static_cast<Value>(4));
+	conf->setValue("badFishMaxVel", static_cast<Value>(8));
+	conf->setValue("badFishSpawnInterval", static_cast<Value>(1.4f));
 
 	conf->setValue("bubbleMoveBy", static_cast<Value>(2.0f));
 	conf->setValue("bubbleUnitVector", static_cast<Value>(2.5f));

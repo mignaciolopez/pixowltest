@@ -165,7 +165,7 @@ bool GameScene::onTouchBegan(cocos2d::Touch * touch, cocos2d::Event * evnt)
 		}
 	}
 
-	return false;
+	return true;
 }
 
 void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
@@ -177,10 +177,7 @@ void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
 		auto bftouched = dynamic_cast<BadFish*>(getUserObject());
 
 		if (bftouched)
-		{
-			m_timeBubbles = 0.0f;
 			spawnBubble();
-		}
 	}
 
 }
@@ -188,6 +185,7 @@ void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
 void GameScene::onTouchEnded(cocos2d::Touch * touch, cocos2d::Event * evnt)
 {
 	onTouchMoved(touch, evnt);
+	setUserObject(nullptr);
 }
 
 void GameScene::onTouchCancelled(cocos2d::Touch * touch, cocos2d::Event * evnt)
@@ -199,6 +197,8 @@ void GameScene::spawnBubble()
 	auto bubble = Bubble::createBubble();
 	if (!bubble)
 		return;
+
+	m_timeBubbles = 0.0f;
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
