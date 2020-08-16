@@ -43,7 +43,7 @@ bool MainMenuScene::init()
 	conf->setValue("badFishMaxVel", static_cast<Value>(8));
 	conf->setValue("badFishSpawnInterval", static_cast<Value>(1.4f));
 
-	conf->setValue("bubbleMoveBy", static_cast<Value>(2.0f));
+	conf->setValue("bubbleAxnTime", static_cast<Value>(2.0f));
 	conf->setValue("bubbleUnitVector", static_cast<Value>(2.5f));
 	conf->setValue("bubbleScale", static_cast<Value>(0.3f));
 	conf->setValue("bubbleOpacity", static_cast<Value>(80));

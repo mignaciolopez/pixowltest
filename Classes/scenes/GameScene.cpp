@@ -35,6 +35,7 @@ bool GameScene::init()
 	m_badFishSpawnInterval = conf->getValue("badFishSpawnInterval", (Value)1.0f).asFloat();
 	m_bubbleUnitVector = conf->getValue("bubbleUnitVector", (Value)2.5f).asFloat();
 	m_bubblesSpawnInterval = conf->getValue("bubblesSpawnInterval", (Value)0.2f).asFloat();
+	m_bubbleAxnTime = conf->getValue("bubbleAxnTime", (Value)2.0f).asFloat();
 
 	auto sprBackground = Sprite::createWithSpriteFrameName(TP::TP_graphics::background);
 	if (!sprBackground)
@@ -56,15 +57,18 @@ bool GameScene::init()
 		m_btnQuit->setContentSize(Size(m_btnQuit->getContentSize().width * 5.0f, m_btnQuit->getContentSize().height * 2.5f));
 		m_btnQuit->setTitleFontSize(48.0f);
 		m_btnQuit->setAnchorPoint(Vec2(0.5f, 0.5f));
-		m_btnQuit->setPosition(Vec2(visibleSize.width + origin.x - m_btnQuit->getContentSize().width / 2.0f, origin.y + m_btnQuit->getContentSize().height / 2.0f));
+		//m_btnQuit->setPosition(Vec2(visibleSize.width + origin.x - m_btnQuit->getContentSize().width / 2.0f, origin.y + m_btnQuit->getContentSize().height / 2.0f));
+		m_btnQuit->setPosition(Vec2(visibleSize.width / 2.0f + origin.x, visibleSize.height / 2.0f + origin.y - 150.0f));
 		m_btnQuit->addTouchEventListener(CC_CALLBACK_2(GameScene::btnTouchEvent, this));
 		m_btnQuit->setZoomScale(0.4f);
 		m_btnQuit->setPressedActionEnabled(true);
-		m_btnQuit->setTitleText("Menu");
+		m_btnQuit->setTitleText("Back");
 		m_btnQuit->setName("btnQuit");
-		m_btnQuit->setOpacity(100.0f);
+		//m_btnQuit->setOpacity(100.0f);
 		m_btnQuit->setOpacityModifyRGB(true);
 		addChild(m_btnQuit, 1);
+
+		m_btnQuit->setVisible(false);
 	}
 
 	m_fish = Fish::createFish();
@@ -165,7 +169,7 @@ bool GameScene::onTouchBegan(cocos2d::Touch * touch, cocos2d::Event * evnt)
 		}
 	}
 
-	return true;
+	return true; //return true here to rotate the fish anyway.
 }
 
 void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
@@ -176,8 +180,10 @@ void GameScene::onTouchMoved(cocos2d::Touch * touch, cocos2d::Event * evnt)
 	{
 		auto bftouched = dynamic_cast<BadFish*>(getUserObject());
 
-		if (bftouched)
-			spawnBubble();
+		if (bftouched && bftouched->getBoundingBox().containsPoint(touch->getLocation()))
+			spawnBubble();	
+			//i wasnt sure about this, but it prevents spawn bubbles with just one touch and then 
+			//moving around and keep spawning bubbles. I think is better this way.
 	}
 
 }
@@ -205,7 +211,8 @@ void GameScene::spawnBubble()
 	m_bubbles.emplace(m_bubblesCount, bubble);
 	addChild(bubble, 3);
 	bubble->setTag(m_bubblesCount++);
-
+	
+	//all this math is to obtain the position of the mouth relative to the current fish rotation
 	Vec2 unitVector = Vec2::ZERO;
 	auto fishSize = m_fish->getContentSize() * m_fish->getScale() / 2.0f;
 	Vec2 mouthPos = m_fish->getPosition();
@@ -216,9 +223,16 @@ void GameScene::spawnBubble()
 	mouthPos.y += unitVector.y * - fishSize.height;
 	bubble->setPosition(mouthPos);
 
-	unitVector.x *=   visibleSize.width  / m_bubbleUnitVector;
-	unitVector.y *= - visibleSize.height / m_bubbleUnitVector;
-	auto axn = MoveBy::create(3.0f, unitVector);
+	///////////////////////////////
+	/*
+	unitVector.x *=   visibleSize.width  / m_bubbleUnitVector;	//This can make the bubble go to the edge of
+	unitVector.y *= - visibleSize.height / m_bubbleUnitVector;	//badfish and not collide.
+	auto axn = MoveBy::create(m_bubbleAxnTime, unitVector); 
+	*/
+	auto bftouched = dynamic_cast<BadFish*>(getUserObject());	//this one fixes it, but it always goes to
+	auto axn = MoveTo::create(m_bubbleAxnTime, bftouched->getPosition());	//the anchorpoint of bad fish. (center)
+	///////////////////////////////
+
 	bubble->runAction(axn);
 
 	bubble->setOnExitCallback([this, bubble]()
@@ -278,4 +292,6 @@ void GameScene::GameOver()
 	addChild(label, 5);
 	m_gameOver = true;
 	Director::getInstance()->setAnimationInterval(1.0f / m_gameOverFPS);
+
+	m_btnQuit->setVisible(true);
 }

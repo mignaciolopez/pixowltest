@@ -58,6 +58,7 @@ private:
 		m_gameOverFPS,
 		m_fishAnimationTime,
 		m_badFishSpawnInterval,
+		m_bubbleAxnTime,
 		m_bubbleUnitVector,
 		m_bubblesSpawnInterval;
 };
